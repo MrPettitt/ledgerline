@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Ledgerline.Core/Ledgerline.Core.csproj" />
+    <Project Path="src/Ledgerline.Data/Ledgerline.Data.csproj" />
+    <Project Path="src/Ledgerline.Web/Ledgerline.Web.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Ledgerline.Tests/Ledgerline.Tests.csproj" />
+  </Folder>
+</Solution>

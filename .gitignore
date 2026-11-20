@@ -1,0 +1,17 @@
+bin/
+obj/
+.vs/
+*.user
+
+# local database
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# real statements never belong in the repo
+*.csv
+*.pdf
+*.ofx
+!samples/*.csv
