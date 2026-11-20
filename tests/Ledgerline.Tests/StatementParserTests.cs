@@ -52,6 +52,14 @@ public class StatementParserTests
     }
 
     [Fact]
+    public void Parse_MatchesColumnNamesIgnoringCaseAndSpaces()
+    {
+        var rows = Parse("  DATE ,description,AMOUNT\n2026-08-03,SAMPLE GYM,-399.00");
+
+        Assert.Equal(399.00m, Assert.Single(rows).Amount);
+    }
+
+    [Fact]
     public void Parse_ThrowsWhenAColumnIsMissing()
     {
         var error = Assert.Throws<StatementFormatException>(() => Parse("Date,Details,Amount\n2026-08-03,X,-1.00"));
