@@ -204,3 +204,117 @@ h1:focus {
 .import-empty {
     margin-top: 32px;
 }
+
+/* Accessibility */
+
+.visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.skip-link {
+    position: absolute;
+    left: 8px;
+    top: -48px;
+    z-index: 2000;
+    padding: 10px 16px;
+    border-radius: var(--mud-default-borderradius);
+    background: var(--mud-palette-surface);
+    color: var(--mud-palette-primary);
+    border: 1px solid var(--mud-palette-primary);
+}
+
+.skip-link:focus {
+    top: 8px;
+}
+
+:focus-visible:not(.mud-input-slot) {
+    outline: 2px solid var(--mud-palette-primary) !important;
+    outline-offset: 2px;
+}
+
+main:focus {
+    outline: none;
+}
+
+.attention a {
+    display: inline-block;
+    padding: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Narrow screens: the side panel becomes a strip above the page */
+@media (max-width: 900px) {
+    .mud-main-content {
+        padding-left: 0 !important;
+        margin-left: 0 !important;
+    }
+
+    .app-drawer {
+        position: relative !important;
+        width: 100% !important;
+        height: auto !important;
+        transform: none !important;
+        border-right: 0;
+        border-bottom: 1px solid var(--mud-palette-lines-default);
+    }
+
+    .app-drawer .mud-drawer-content {
+        display: flex;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .app-brand {
+        flex: 1 1 auto;
+        padding: 16px;
+        text-align: left;
+    }
+
+    .app-drawer-footer {
+        margin: 0;
+        padding: 8px 12px;
+    }
+
+    .app-nav {
+        display: flex;
+        order: 3;
+        flex: 1 1 100%;
+        flex-direction: row !important;
+        flex-wrap: wrap;
+        gap: 4px;
+        padding: 0 8px 8px;
+    }
+
+    .app-nav .mud-nav-item {
+        width: auto;
+    }
+
+    .app-nav .mud-nav-link {
+        width: auto;
+    }
+
+    .app-page {
+        padding: 24px 16px;
+    }
+
+    .import-panel, .profile-form {
+        max-width: none;
+    }
+}
