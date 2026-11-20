@@ -9,7 +9,7 @@
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
 ![Blazor](https://img.shields.io/badge/Blazor-Interactive%20Server-512BD4?logo=blazor&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-local%20file-003B57?logo=sqlite&logoColor=white)
-![Tests](https://img.shields.io/badge/unit%20tests-50-brightgreen)
+![Tests](https://img.shields.io/badge/unit%20tests-70-brightgreen)
 ![Network](https://img.shields.io/badge/network-local%20only-lightgrey)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -25,6 +25,10 @@ No account. No cloud. No sign-in.
 <p align="center">
   <img src="docs/screenshots/alerts.png" width="48%" alt="Alerts for a missed charge, a price increase and an upcoming renewal" />
   <img src="docs/screenshots/subscriptions-dark.png" width="48%" alt="Subscriptions table in the dark theme" />
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/settings.png" width="48%" alt="Settings page listing bank profiles" />
 </p>
 
 All data in the screenshots is invented. The merchants come from [`samples/sample-statement.csv`](samples/sample-statement.csv).
@@ -48,11 +52,11 @@ Current version: **v0.2.0**. This is a portfolio project. It is not a finished p
 | Check | Status | Notes |
 |---|---|---|
 | Build and tests in CI | ✅ Passing | Runs on every push and pull request |
-| Unit tests | ✅ 50 passing | Parser, merchant matching, importer, detector, alerts, summary, statuses and a migration smoke test |
+| Unit tests | ✅ 70 passing | Parser, bank profiles, merchant matching, importer, detector, alerts, summary, statuses and a migration smoke test |
 | Windows release build | ✅ Checked | The published build runs from its own folder and serves pages, styles and the font. Checked on a machine that also has .NET installed |
-| Pages in a browser | ✅ Checked | Overview, Subscriptions, Import and Alerts exercised with the sample statement. Dark theme spot-checked |
+| Pages in a browser | ✅ Checked | Overview, Subscriptions, Import, Alerts and Settings exercised with invented data. Dark theme spot-checked |
 | A real bank export | 🟡 Not tested | Only the Generic CSV layout below has been used. Your bank may need its own profile |
-| Bank profile editor | 🟡 Not built | Profiles are seeded in the database. The Settings page is still a placeholder |
+| Bank profile editor | ✅ Checked | Add, edit and delete profiles on Settings, then import with a new layout. Validation and delete protection tried in a browser |
 | Phones and narrow windows | 🟡 Not designed for | The navigation is a fixed side panel |
 | Accessibility audit | 🟡 Not done | Colours and focus order have not been formally checked |
 
@@ -92,6 +96,7 @@ Current version: **v0.2.0**. This is a portfolio project. It is not a finished p
 - **Statement import**: choose a bank profile and a CSV up to 5 MB. The result shows how many debits were read, added and skipped as already imported.
 - **Duplicate-safe**: every transaction gets a fingerprint from its date, description, amount and its position among identical rows. Re-importing an overlapping statement adds only the new rows, and two identical coffees on one day are both kept.
 - **Clear errors**: a missing column, a date in the wrong format or a value that is not an amount stops the import with a message that names the row.
+- **Bank profiles**: add, edit and delete the CSV layouts on the Settings page. The date format shows a live example, column names ignore capital letters, and a profile that statements were imported with cannot be deleted.
 - **Subscriptions table**: amount, billing interval, next expected date, status and a note such as `Price changed from 149,99 to 169,99 on 2026-10-03`.
 - **Overview**: monthly and yearly totals. Weekly, quarterly and yearly subscriptions are converted to a monthly cost so they can be added up.
 - **Alerts**: missed charges first, then price increases, then renewals by date. Price decreases are not flagged.
@@ -125,7 +130,7 @@ Current version: **v0.2.0**. This is a portfolio project. It is not a finished p
 src/
 ├── Ledgerline.Core/        # Logic only. No UI or database references
 │   ├── Domain/             # Entities and enums
-│   ├── Importing/          # Statement parser, merchant keys, transaction fingerprints
+│   ├── Importing/          # Statement parser, bank profile validation, merchant keys, fingerprints
 │   ├── Detection/          # Subscription detector and cadence rules
 │   ├── Alerts/             # Alert builder
 │   └── Summary/            # Overview totals and monthly cost
@@ -185,9 +190,9 @@ On the Import page choose `samples/sample-statement.csv` with the **Generic CSV*
 - `SAMPLE GYM MONTHLY`, `DEMO CLOUD STORAGE` and `TESTCO MOBILE CONTRACT` repeat at a fixed price.
 - Groceries, fuel and cafe visits are ignored, and the salary is skipped as a credit.
 
-### The Generic CSV layout
+### Bank profiles and the Generic CSV layout
 
-The only bank profile that ships today expects a header row with these columns:
+Open **Settings** to add a profile for your bank: the names of its date, description and amount columns, the date format, and whether money going out is negative. One profile ships with the app, **Generic CSV**, which expects a header row like this:
 
 ```
 Date,Description,Amount
@@ -222,7 +227,7 @@ The release workflow runs the tests, builds the zip and creates the release with
 
 ## Roadmap
 
-- Bank profile editor on the Settings page, and a profile for Standard Bank once a real export's headers are known
+- A ready-made profile for Standard Bank once a real export's headers are known
 - Remember the theme choice between visits
 - Dismiss an alert you have dealt with
 - Spending history per subscription
