@@ -13,12 +13,12 @@
 }
 else
 {
-    <MudPaper Outlined Class="alert-list">
+    <MudPaper Outlined Class="list-panel">
         @foreach (var alert in _alerts)
         {
-            <div class="alert-row">
+            <div class="list-row">
                 <div>
-                    <div class="alert-title">@alert.MerchantName</div>
+                    <div class="list-title">@alert.MerchantName</div>
                     <div class="page-description">@Describe(alert)</div>
                 </div>
                 <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@Label(alert.Kind)</MudChip>
