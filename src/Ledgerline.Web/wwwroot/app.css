@@ -85,3 +85,13 @@ h1:focus {
 .import-panel .mud-input-control {
     width: 100%;
 }
+
+.subscriptions-table {
+    margin-top: 32px;
+    border: 1px solid var(--mud-palette-lines-default);
+    overflow: hidden;
+}
+
+.subscriptions-empty {
+    margin-top: 32px;
+}

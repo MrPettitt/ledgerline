@@ -5,6 +5,7 @@
 @using Microsoft.EntityFrameworkCore
 @inject LedgerlineDbContext Database
 @inject StatementImporter Importer
+@inject SubscriptionDetectionService Detection
 
 <PageHeader Title="Import" Description="Bring in a bank statement CSV from this page." />
 
@@ -30,6 +31,7 @@
     {
         <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
             Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
+            Found @_subscriptionCount recurring @(_subscriptionCount == 1 ? "charge" : "charges").
         </MudAlert>
     }
 </MudPaper>
@@ -41,6 +43,7 @@
     private int _bankProfileId;
     private IBrowserFile? _file;
     private ImportResult? _result;
+    private int _subscriptionCount;
     private string? _error;
     private bool _importing;
 
@@ -71,6 +74,7 @@
             buffer.Position = 0;
 
             _result = await Importer.ImportAsync(_file.Name, buffer, _bankProfileId);
+            _subscriptionCount = await Detection.RunAsync();
         }
         catch (StatementFormatException ex)
         {
