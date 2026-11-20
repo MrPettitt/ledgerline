@@ -47,7 +47,7 @@ All data in the screenshots is invented. The merchants come from [`samples/sampl
 
 ## Project status
 
-Current version: **v0.2.0**. This is a portfolio project. It is not a finished product and has only been used with invented data.
+Current version: **v0.3.0**. This is a portfolio project. It is not a finished product and has only been used with invented data.
 
 | Check | Status | Notes |
 |---|---|---|
@@ -64,6 +64,7 @@ Current version: **v0.2.0**. This is a portfolio project. It is not a finished p
 
 | Version | What it added |
 |---|---|
+| v0.3.0 | Bank profile editor on the Settings page, and column names that ignore capital letters |
 | v0.2.0 | Overview page: monthly and yearly spend, alerts callout, most expensive subscriptions, renewals in the next 30 days |
 | v0.1.0 | First release: app shell, CSV import, subscription detection, Alerts page, confirm, ignore and cancel controls, light and dark themes |
 
