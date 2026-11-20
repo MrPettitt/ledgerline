@@ -9,7 +9,7 @@ public class StatementParser
 {
     public IReadOnlyList<ParsedTransaction> Parse(TextReader input, BankProfile profile)
     {
-        var configuration = new CsvConfiguration(CultureInfo.InvariantCulture) { PrepareHeaderForMatch = args => args.Header.Trim() };
+        var configuration = new CsvConfiguration(CultureInfo.InvariantCulture) { PrepareHeaderForMatch = args => args.Header.Trim().ToLowerInvariant() };
         using var csv = new CsvReader(input, configuration);
 
         if (!csv.Read() || !csv.ReadHeader())
@@ -42,7 +42,7 @@ public class StatementParser
         var header = csv.HeaderRecord ?? [];
         foreach (var column in new[] { profile.DateColumn, profile.DescriptionColumn, profile.AmountColumn })
         {
-            if (!header.Any(h => h.Trim() == column))
+            if (!header.Any(h => string.Equals(h.Trim(), column.Trim(), StringComparison.OrdinalIgnoreCase)))
             {
                 throw new StatementFormatException($"The file has no '{column}' column. Check the bank profile '{profile.Name}'.");
             }
