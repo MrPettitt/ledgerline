@@ -12,6 +12,8 @@ public static class ServiceCollectionExtensions
         return services
             .AddDbContext<LedgerlineDbContext>(options => options.UseSqlite(connectionString))
             .AddSingleton<StatementParser>()
+            .AddSingleton<BankProfileValidator>()
+            .AddScoped<BankProfileService>()
             .AddSingleton<SubscriptionDetector>()
             .AddScoped<SubscriptionDetectionService>()
             .AddScoped<SubscriptionStatusService>()
