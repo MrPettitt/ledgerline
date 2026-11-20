@@ -15,3 +15,16 @@ obj/
 *.pdf
 *.ofx
 !samples/*.csv
+
+# spreadsheets and other statement formats
+*.xlsx
+*.xls
+*.qif
+
+# secrets
+.env
+.env.*
+*.pfx
+*.pem
+*.key
+appsettings.*.local.json
