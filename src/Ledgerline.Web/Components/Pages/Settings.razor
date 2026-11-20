@@ -7,10 +7,10 @@
 
 <PageHeader Title="Settings" Description="Bank profiles tell Ledgerline how to read the CSV from each bank." />
 
-<MudText Typo="Typo.h6" Class="section-title">Bank profiles</MudText>
+<MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Bank profiles</MudText>
 
 <MudPaper Outlined Class="table-panel">
-    <MudTable Items="_profiles" Elevation="0" Hover="true">
+    <MudTable Items="_profiles" Elevation="0" Hover="true" Breakpoint="Breakpoint.Md">
         <HeaderContent>
             <MudTh>Name</MudTh>
             <MudTh>Date</MudTh>
@@ -18,15 +18,15 @@
             <MudTh>Amount</MudTh>
             <MudTh>Date format</MudTh>
             <MudTh>Money out</MudTh>
-            <MudTh></MudTh>
+            <MudTh><span class="visually-hidden">Actions</span></MudTh>
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Name</MudTd>
-            <MudTd>@context.DateColumn</MudTd>
-            <MudTd>@context.DescriptionColumn</MudTd>
-            <MudTd>@context.AmountColumn</MudTd>
-            <MudTd>@context.DateFormat</MudTd>
-            <MudTd>@(context.DebitsAreNegative ? "Negative" : "Positive")</MudTd>
+            <MudTd DataLabel="Name">@context.Name</MudTd>
+            <MudTd DataLabel="Date">@context.DateColumn</MudTd>
+            <MudTd DataLabel="Description">@context.DescriptionColumn</MudTd>
+            <MudTd DataLabel="Amount">@context.AmountColumn</MudTd>
+            <MudTd DataLabel="Date format">@context.DateFormat</MudTd>
+            <MudTd DataLabel="Money out">@(context.DebitsAreNegative ? "Negative" : "Positive")</MudTd>
             <MudTd Style="white-space: nowrap">
                 <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small"
                                aria-label="@($"Edit {context.Name}")" OnClick="() => Edit(context)" />
@@ -37,10 +37,12 @@
     </MudTable>
 </MudPaper>
 
-@if (_notice is not null)
-{
-    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="settings-alert">@_notice</MudAlert>
-}
+<div aria-live="polite">
+    @if (_notice is not null)
+    {
+        <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="settings-alert">@_notice</MudAlert>
+    }
+</div>
 
 @if (_form is null)
 {
@@ -52,7 +54,7 @@
 else
 {
     <MudPaper Outlined Class="profile-form">
-        <MudText Typo="Typo.h6">@(_form.Id == 0 ? "New profile" : "Edit profile")</MudText>
+        <MudText Typo="Typo.h6" HtmlTag="h3">@(_form.Id == 0 ? "New profile" : "Edit profile")</MudText>
         <MudText Class="page-description">
             Column names must match the first row of your CSV. Capital letters do not matter.
         </MudText>
@@ -66,10 +68,12 @@ else
         <MudSwitch T="bool" @bind-Value="_form.DebitsAreNegative" Color="Color.Primary"
                    Label="Money going out is negative in this file" />
 
-        @foreach (var error in _errors)
-        {
-            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@error</MudAlert>
-        }
+        <div aria-live="assertive" class="form-errors">
+            @foreach (var error in _errors)
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@error</MudAlert>
+            }
+        </div>
 
         <div class="profile-form-actions">
             <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAsync">Save</MudButton>

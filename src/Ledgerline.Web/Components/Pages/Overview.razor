@@ -40,7 +40,7 @@ else
         </MudPaper>
     }
 
-    <MudText Typo="Typo.h6" Class="section-title">Most expensive</MudText>
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Most expensive</MudText>
     <MudPaper Outlined Class="list-panel">
         @foreach (var cost in _summary.MostExpensive)
         {
@@ -51,7 +51,7 @@ else
         }
     </MudPaper>
 
-    <MudText Typo="Typo.h6" Class="section-title">Coming up in the next 30 days</MudText>
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Coming up in the next 30 days</MudText>
     @if (_summary.UpcomingRenewals.Count == 0)
     {
         <MudText Class="page-description">No renewals expected.</MudText>

@@ -30,17 +30,19 @@ else
             Import
         </MudButton>
 
-        @if (_error is not null)
-        {
-            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
-        }
-        @if (_result is not null)
-        {
-            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
-                Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
-                Found @_subscriptionCount recurring @(_subscriptionCount == 1 ? "charge" : "charges").
-            </MudAlert>
-        }
+        <div aria-live="polite" class="import-messages">
+            @if (_error is not null)
+            {
+                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
+            }
+            @if (_result is not null)
+            {
+                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                    Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
+                    Found @_subscriptionCount recurring @(_subscriptionCount == 1 ? "charge" : "charges").
+                </MudAlert>
+            }
+        </div>
     </MudPaper>
 }
 
