@@ -1,9 +1,6 @@
 @inherits LayoutComponentBase
 
 <MudThemeProvider Theme="_theme" @bind-IsDarkMode="_isDarkMode" />
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
 
 <a class="skip-link" href="#main-content">Skip to main content</a>
 
@@ -22,6 +19,10 @@
     <MudMainContent>
         <main id="main-content" class="app-page" tabindex="-1">
             @Body
+
+            <MudPopoverProvider />
+            <MudDialogProvider />
+            <MudSnackbarProvider />
         </main>
     </MudMainContent>
 </MudLayout>
