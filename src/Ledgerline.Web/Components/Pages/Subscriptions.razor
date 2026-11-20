@@ -3,6 +3,7 @@
 @using Ledgerline.Data
 @using Microsoft.EntityFrameworkCore
 @inject LedgerlineDbContext Database
+@inject SubscriptionStatusService Statuses
 
 <PageHeader Title="Subscriptions" Description="Every recurring charge Ledgerline finds is listed here." />
 
@@ -13,7 +14,7 @@
 else
 {
     <MudPaper Outlined Class="subscriptions-table">
-        <MudTable Items="_subscriptions" Elevation="0" Hover="true" Dense="false">
+        <MudTable Items="_subscriptions" Elevation="0" Hover="true" Dense="false" RowClassFunc="RowClass">
             <HeaderContent>
                 <MudTh>Merchant</MudTh>
                 <MudTh Style="text-align: right">Amount</MudTh>
@@ -21,6 +22,7 @@ else
                 <MudTh>Next expected</MudTh>
                 <MudTh>Status</MudTh>
                 <MudTh>Notes</MudTh>
+                <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>@context.Merchant?.DisplayName</MudTd>
@@ -34,6 +36,16 @@ else
                     </MudChip>
                 </MudTd>
                 <MudTd>@Note(context)</MudTd>
+                <MudTd>
+                    <MudMenu Icon="@Icons.Material.Outlined.MoreVert" Size="Size.Small" AriaLabel="@($"Actions for {context.Merchant?.DisplayName}")">
+                        @foreach (var status in Enum.GetValues<SubscriptionStatus>().Where(s => s != context.Status))
+                        {
+                            var subscription = context;
+                            var target = status;
+                            <MudMenuItem OnClick="() => SetStatus(subscription, target)">@ActionLabel(target)</MudMenuItem>
+                        }
+                    </MudMenu>
+                </MudTd>
             </RowTemplate>
         </MudTable>
     </MudPaper>
@@ -42,7 +54,9 @@ else
 @code {
     private List<Subscription> _subscriptions = [];
 
-    protected override async Task OnInitializedAsync()
+    protected override Task OnInitializedAsync() => LoadAsync();
+
+    private async Task LoadAsync()
     {
         var subscriptions = await Database.Subscriptions
             .AsNoTracking()
@@ -53,6 +67,23 @@ else
         // SQLite cannot order decimals, and the list is small.
         _subscriptions = subscriptions.OrderByDescending(s => s.CurrentAmount).ToList();
     }
+
+    private async Task SetStatus(Subscription subscription, SubscriptionStatus status)
+    {
+        await Statuses.SetStatusAsync(subscription.Id, status);
+        await LoadAsync();
+    }
+
+    private static string RowClass(Subscription subscription, int index) =>
+        subscription.Status is SubscriptionStatus.Ignored or SubscriptionStatus.Cancelled ? "row-inactive" : string.Empty;
+
+    private static string ActionLabel(SubscriptionStatus status) => status switch
+    {
+        SubscriptionStatus.Confirmed => "Confirm",
+        SubscriptionStatus.Ignored => "Ignore",
+        SubscriptionStatus.Cancelled => "Mark as cancelled",
+        _ => "Mark as suspected"
+    };
 
     private static string Note(Subscription subscription)
     {

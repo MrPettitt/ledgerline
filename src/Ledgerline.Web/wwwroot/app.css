@@ -120,3 +120,11 @@ h1:focus {
 .alert-title {
     font-weight: 600;
 }
+
+.row-inactive td {
+    opacity: 0.55;
+}
+
+.row-inactive td:last-child {
+    opacity: 1;
+}

@@ -14,6 +14,7 @@ public static class ServiceCollectionExtensions
             .AddSingleton<StatementParser>()
             .AddSingleton<SubscriptionDetector>()
             .AddScoped<SubscriptionDetectionService>()
+            .AddScoped<SubscriptionStatusService>()
             .AddScoped<StatementImporter>();
     }
 }
