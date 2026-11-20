@@ -11,6 +11,7 @@ public static class LedgerlineTheme
         PaletteLight = new PaletteLight
         {
             Primary = "#0F5E5A",
+            Secondary = "#66645E",
             Background = "#F7F6F3",
             Surface = "#FFFFFF",
             DrawerBackground = "#FFFFFF",
@@ -23,6 +24,7 @@ public static class LedgerlineTheme
         PaletteDark = new PaletteDark
         {
             Primary = "#4DB3AC",
+            Secondary = "#A3A19A",
             Background = "#151514",
             Surface = "#1E1E1C",
             DrawerBackground = "#1E1E1C",

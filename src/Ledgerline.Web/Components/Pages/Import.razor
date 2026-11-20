@@ -1,3 +1,88 @@
 @page "/import"
+@using Ledgerline.Core.Domain
+@using Ledgerline.Core.Importing
+@using Ledgerline.Data
+@using Microsoft.EntityFrameworkCore
+@inject LedgerlineDbContext Database
+@inject StatementImporter Importer
 
 <PageHeader Title="Import" Description="Bring in a bank statement CSV from this page." />
+
+<MudPaper Outlined Class="import-panel">
+    <MudSelect T="int" @bind-Value="_bankProfileId" Label="Bank profile" Variant="Variant.Outlined">
+        @foreach (var profile in _profiles)
+        {
+            <MudSelectItem T="int" Value="@profile.Id">@profile.Name</MudSelectItem>
+        }
+    </MudSelect>
+
+    <MudFileUpload T="IBrowserFile" Accept=".csv" FilesChanged="OnFileChosen" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_file is null || _importing)" OnClick="ImportAsync">
+        Import
+    </MudButton>
+
+    @if (_error is not null)
+    {
+        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
+    }
+    @if (_result is not null)
+    {
+        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+            Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
+        </MudAlert>
+    }
+</MudPaper>
+
+@code {
+    private const long MaxFileBytes = 5 * 1024 * 1024;
+
+    private List<BankProfile> _profiles = [];
+    private int _bankProfileId;
+    private IBrowserFile? _file;
+    private ImportResult? _result;
+    private string? _error;
+    private bool _importing;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _profiles = await Database.BankProfiles.AsNoTracking().OrderBy(p => p.Name).ToListAsync();
+        _bankProfileId = _profiles.FirstOrDefault()?.Id ?? 0;
+    }
+
+    private void OnFileChosen(IBrowserFile? file)
+    {
+        _file = file;
+        _result = null;
+        _error = null;
+    }
+
+    private async Task ImportAsync()
+    {
+        _importing = true;
+        _result = null;
+        _error = null;
+
+        try
+        {
+            // Browser streams are async only, but the CSV reader reads synchronously.
+            using var buffer = new MemoryStream();
+            await _file!.OpenReadStream(MaxFileBytes).CopyToAsync(buffer);
+            buffer.Position = 0;
+
+            _result = await Importer.ImportAsync(_file.Name, buffer, _bankProfileId);
+        }
+        catch (StatementFormatException ex)
+        {
+            _error = ex.Message;
+        }
+        catch (IOException)
+        {
+            _error = "That file is larger than 5 MB.";
+        }
+        finally
+        {
+            _importing = false;
+        }
+    }
+}
