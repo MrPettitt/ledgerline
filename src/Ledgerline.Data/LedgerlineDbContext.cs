@@ -15,6 +15,16 @@ public class LedgerlineDbContext(DbContextOptions<LedgerlineDbContext> options) 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BankProfile>().HasIndex(p => p.Name).IsUnique();
+        modelBuilder.Entity<BankProfile>().HasData(new BankProfile
+        {
+            Id = 1,
+            Name = "Generic CSV",
+            DateColumn = "Date",
+            DescriptionColumn = "Description",
+            AmountColumn = "Amount",
+            DateFormat = "yyyy-MM-dd",
+            DebitsAreNegative = true
+        });
 
         modelBuilder.Entity<Merchant>().HasIndex(m => m.Key).IsUnique();
 

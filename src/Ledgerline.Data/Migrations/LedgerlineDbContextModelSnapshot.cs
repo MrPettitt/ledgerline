@@ -52,6 +52,18 @@ namespace Ledgerline.Data.Migrations
                         .IsUnique();
 
                     b.ToTable("BankProfiles");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AmountColumn = "Amount",
+                            DateColumn = "Date",
+                            DateFormat = "yyyy-MM-dd",
+                            DebitsAreNegative = true,
+                            DescriptionColumn = "Description",
+                            Name = "Generic CSV"
+                        });
                 });
 
             modelBuilder.Entity("Ledgerline.Core.Domain.Merchant", b =>
