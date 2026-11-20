@@ -99,9 +99,10 @@ Current version: **v0.2.0**. This is a portfolio project. It is not a finished p
 - **Light and dark themes**: warm off-white and white surfaces with one teal accent. Inter is bundled with the app, so no fonts are loaded from the internet.
 - **Local storage**: one SQLite file, `ledgerline.db`, next to the app. Money is stored as `decimal`.
 
-## Privacy
+## Privacy and security
 
 - The app makes no outbound requests. Fonts, icons and styles are bundled.
+- It listens on `localhost` only and rejects other host names. There is no login, so do not expose it beyond your own computer. See [SECURITY.md](SECURITY.md).
 - Your data lives in `ledgerline.db`. Delete the file to start again.
 - `.gitignore` blocks `*.db`, `*.csv`, `*.pdf` and `*.ofx` everywhere except the `samples` folder, so a real statement cannot be committed by accident.
 - Everything under `samples` and in the tests uses invented merchants.
