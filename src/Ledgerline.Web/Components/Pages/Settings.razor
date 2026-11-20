@@ -2,6 +2,7 @@
 @using Ledgerline.Core.Domain
 @using Ledgerline.Core.Importing
 @using Ledgerline.Data
+@using Ledgerline.Web.Components.Dialogs
 @inject BankProfileService Profiles
 @inject IDialogService Dialogs
 
@@ -134,12 +135,14 @@ else
     private async Task DeleteAsync(BankProfile profile)
     {
         _notice = null;
-        var confirmed = await Dialogs.ShowMessageBoxAsync(
-            "Delete profile",
-            $"Delete the profile '{profile.Name}'?",
-            yesText: "Delete",
-            cancelText: "Cancel");
-        if (confirmed != true)
+        var parameters = new DialogParameters<ConfirmDialog>
+        {
+            { d => d.Title, "Delete profile" },
+            { d => d.Message, $"Delete the profile '{profile.Name}'?" },
+            { d => d.ConfirmText, "Delete" }
+        };
+        var dialog = await Dialogs.ShowAsync<ConfirmDialog>(null, parameters);
+        if ((await dialog.Result)?.Canceled != false)
         {
             return;
         }
