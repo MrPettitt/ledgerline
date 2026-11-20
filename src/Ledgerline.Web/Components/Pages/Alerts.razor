@@ -1,3 +1,69 @@
 @page "/alerts"
+@using Ledgerline.Core.Alerts
+@using Ledgerline.Data
+@using Microsoft.EntityFrameworkCore
+@inject LedgerlineDbContext Database
+@inject TimeProvider Time
 
-<PageHeader Title="Alerts" Description="Price increases and upcoming renewals will show up here." />
+<PageHeader Title="Alerts" Description="Price increases, missed charges and renewals coming up this week." />
+
+@if (_alerts.Count == 0)
+{
+    <MudText Class="page-description alerts-empty">Nothing needs your attention.</MudText>
+}
+else
+{
+    <MudPaper Outlined Class="alert-list">
+        @foreach (var alert in _alerts)
+        {
+            <div class="alert-row">
+                <div>
+                    <div class="alert-title">@alert.MerchantName</div>
+                    <div class="page-description">@Describe(alert)</div>
+                </div>
+                <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined">@Label(alert.Kind)</MudChip>
+            </div>
+        }
+    </MudPaper>
+}
+
+@code {
+    private IReadOnlyList<Alert> _alerts = [];
+    private DateOnly _today;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _today = DateOnly.FromDateTime(Time.GetLocalNow().DateTime);
+
+        var subscriptions = await Database.Subscriptions
+            .AsNoTracking()
+            .Include(s => s.Merchant)
+            .Include(s => s.Events)
+            .ToListAsync();
+
+        _alerts = new AlertBuilder().Build(subscriptions, _today);
+    }
+
+    private static string Label(AlertKind kind) => kind switch
+    {
+        AlertKind.MissedRenewal => "Missed",
+        AlertKind.PriceIncrease => "Price increase",
+        _ => "Renewal"
+    };
+
+    private string Describe(Alert alert) => alert.Kind switch
+    {
+        AlertKind.MissedRenewal =>
+            $"Expected {alert.Amount:N2} on {alert.Date:yyyy-MM-dd} but no charge was seen. It may have been cancelled.",
+        AlertKind.PriceIncrease =>
+            $"Went up from {alert.PreviousAmount:N2} to {alert.Amount:N2} on {alert.Date:yyyy-MM-dd}.",
+        _ => $"Renews {alert.Amount:N2} on {alert.Date:yyyy-MM-dd}, {DaysAway(alert.Date)}."
+    };
+
+    private string DaysAway(DateOnly date) => (date.DayNumber - _today.DayNumber) switch
+    {
+        0 => "today",
+        1 => "tomorrow",
+        var days => $"in {days} days"
+    };
+}

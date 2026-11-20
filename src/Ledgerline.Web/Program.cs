@@ -8,6 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddMudServices();
+builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddLedgerlineData(builder.Configuration.GetConnectionString("Ledgerline")!);
 
 var app = builder.Build();

@@ -95,3 +95,28 @@ h1:focus {
 .subscriptions-empty {
     margin-top: 32px;
 }
+
+.alerts-empty {
+    margin-top: 32px;
+}
+
+.alert-list {
+    margin-top: 32px;
+    border: 1px solid var(--mud-palette-lines-default);
+}
+
+.alert-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 24px;
+}
+
+.alert-row + .alert-row {
+    border-top: 1px solid var(--mud-palette-lines-default);
+}
+
+.alert-title {
+    font-weight: 600;
+}
