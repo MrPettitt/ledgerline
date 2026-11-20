@@ -2,39 +2,47 @@
 @using Ledgerline.Core.Domain
 @using Ledgerline.Core.Importing
 @using Ledgerline.Data
-@using Microsoft.EntityFrameworkCore
-@inject LedgerlineDbContext Database
+@inject BankProfileService Profiles
 @inject StatementImporter Importer
 @inject SubscriptionDetectionService Detection
 
 <PageHeader Title="Import" Description="Bring in a bank statement CSV from this page." />
 
-<MudPaper Outlined Class="import-panel">
-    <MudSelect T="int" @bind-Value="_bankProfileId" Label="Bank profile" Variant="Variant.Outlined">
-        @foreach (var profile in _profiles)
+@if (_profiles.Count == 0)
+{
+    <MudText Class="page-description import-empty">
+        No bank profile yet. <MudLink Href="/settings">Add one in Settings</MudLink> first.
+    </MudText>
+}
+else
+{
+    <MudPaper Outlined Class="import-panel">
+        <MudSelect T="int" @bind-Value="_bankProfileId" Label="Bank profile" Variant="Variant.Outlined">
+            @foreach (var profile in _profiles)
+            {
+                <MudSelectItem T="int" Value="@profile.Id">@profile.Name</MudSelectItem>
+            }
+        </MudSelect>
+
+        <MudFileUpload T="IBrowserFile" Accept=".csv" FilesChanged="OnFileChosen" />
+
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_file is null || _importing)" OnClick="ImportAsync">
+            Import
+        </MudButton>
+
+        @if (_error is not null)
         {
-            <MudSelectItem T="int" Value="@profile.Id">@profile.Name</MudSelectItem>
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
         }
-    </MudSelect>
-
-    <MudFileUpload T="IBrowserFile" Accept=".csv" FilesChanged="OnFileChosen" />
-
-    <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_file is null || _importing)" OnClick="ImportAsync">
-        Import
-    </MudButton>
-
-    @if (_error is not null)
-    {
-        <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
-    }
-    @if (_result is not null)
-    {
-        <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
-            Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
-            Found @_subscriptionCount recurring @(_subscriptionCount == 1 ? "charge" : "charges").
-        </MudAlert>
-    }
-</MudPaper>
+        @if (_result is not null)
+        {
+            <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
+                Found @_subscriptionCount recurring @(_subscriptionCount == 1 ? "charge" : "charges").
+            </MudAlert>
+        }
+    </MudPaper>
+}
 
 @code {
     private const long MaxFileBytes = 5 * 1024 * 1024;
@@ -49,7 +57,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _profiles = await Database.BankProfiles.AsNoTracking().OrderBy(p => p.Name).ToListAsync();
+        _profiles = await Profiles.ListAsync();
         _bankProfileId = _profiles.FirstOrDefault()?.Id ?? 0;
     }
 

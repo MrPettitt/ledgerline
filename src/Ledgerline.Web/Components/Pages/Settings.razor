@@ -1,3 +1,156 @@
 @page "/settings"
+@using Ledgerline.Core.Domain
+@using Ledgerline.Core.Importing
+@using Ledgerline.Data
+@inject BankProfileService Profiles
+@inject IDialogService Dialogs
 
-<PageHeader Title="Settings" Description="Bank profiles and preferences will be managed here." />
+<PageHeader Title="Settings" Description="Bank profiles tell Ledgerline how to read the CSV from each bank." />
+
+<MudText Typo="Typo.h6" Class="section-title">Bank profiles</MudText>
+
+<MudPaper Outlined Class="table-panel">
+    <MudTable Items="_profiles" Elevation="0" Hover="true">
+        <HeaderContent>
+            <MudTh>Name</MudTh>
+            <MudTh>Date</MudTh>
+            <MudTh>Description</MudTh>
+            <MudTh>Amount</MudTh>
+            <MudTh>Date format</MudTh>
+            <MudTh>Money out</MudTh>
+            <MudTh></MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Name</MudTd>
+            <MudTd>@context.DateColumn</MudTd>
+            <MudTd>@context.DescriptionColumn</MudTd>
+            <MudTd>@context.AmountColumn</MudTd>
+            <MudTd>@context.DateFormat</MudTd>
+            <MudTd>@(context.DebitsAreNegative ? "Negative" : "Positive")</MudTd>
+            <MudTd Style="white-space: nowrap">
+                <MudIconButton Icon="@Icons.Material.Outlined.Edit" Size="Size.Small"
+                               aria-label="@($"Edit {context.Name}")" OnClick="() => Edit(context)" />
+                <MudIconButton Icon="@Icons.Material.Outlined.DeleteOutline" Size="Size.Small"
+                               aria-label="@($"Delete {context.Name}")" OnClick="() => DeleteAsync(context)" />
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudPaper>
+
+@if (_notice is not null)
+{
+    <MudAlert Severity="Severity.Warning" Variant="Variant.Outlined" Class="settings-alert">@_notice</MudAlert>
+}
+
+@if (_form is null)
+{
+    <MudButton Variant="Variant.Outlined" Color="Color.Primary" StartIcon="@Icons.Material.Outlined.Add"
+               Class="settings-add" OnClick="Add">
+        Add profile
+    </MudButton>
+}
+else
+{
+    <MudPaper Outlined Class="profile-form">
+        <MudText Typo="Typo.h6">@(_form.Id == 0 ? "New profile" : "Edit profile")</MudText>
+        <MudText Class="page-description">
+            Column names must match the first row of your CSV. Capital letters do not matter.
+        </MudText>
+
+        <MudTextField @bind-Value="_form.Name" Label="Profile name" Variant="Variant.Outlined" />
+        <MudTextField @bind-Value="_form.DateColumn" Label="Date column" Variant="Variant.Outlined" />
+        <MudTextField @bind-Value="_form.DescriptionColumn" Label="Description column" Variant="Variant.Outlined" />
+        <MudTextField @bind-Value="_form.AmountColumn" Label="Amount column" Variant="Variant.Outlined" />
+        <MudTextField @bind-Value="_form.DateFormat" Label="Date format" Variant="Variant.Outlined"
+                      Immediate="true" HelperText="@DateFormatHint()" />
+        <MudSwitch T="bool" @bind-Value="_form.DebitsAreNegative" Color="Color.Primary"
+                   Label="Money going out is negative in this file" />
+
+        @foreach (var error in _errors)
+        {
+            <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@error</MudAlert>
+        }
+
+        <div class="profile-form-actions">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAsync">Save</MudButton>
+            <MudButton Variant="Variant.Text" OnClick="Cancel">Cancel</MudButton>
+        </div>
+    </MudPaper>
+}
+
+@code {
+    private List<BankProfile> _profiles = [];
+    private BankProfile? _form;
+    private IReadOnlyList<string> _errors = [];
+    private string? _notice;
+
+    protected override async Task OnInitializedAsync() => _profiles = await Profiles.ListAsync();
+
+    private void Add()
+    {
+        _notice = null;
+        _errors = [];
+        _form = new BankProfile { DateFormat = "yyyy-MM-dd" };
+    }
+
+    private void Edit(BankProfile profile)
+    {
+        _notice = null;
+        _errors = [];
+        _form = new BankProfile
+        {
+            Id = profile.Id,
+            Name = profile.Name,
+            DateColumn = profile.DateColumn,
+            DescriptionColumn = profile.DescriptionColumn,
+            AmountColumn = profile.AmountColumn,
+            DateFormat = profile.DateFormat,
+            DebitsAreNegative = profile.DebitsAreNegative
+        };
+    }
+
+    private void Cancel()
+    {
+        _form = null;
+        _errors = [];
+    }
+
+    private async Task SaveAsync()
+    {
+        _errors = await Profiles.SaveAsync(_form!);
+        if (_errors.Count > 0)
+        {
+            return;
+        }
+
+        _form = null;
+        _profiles = await Profiles.ListAsync();
+    }
+
+    private async Task DeleteAsync(BankProfile profile)
+    {
+        _notice = null;
+        var confirmed = await Dialogs.ShowMessageBoxAsync(
+            "Delete profile",
+            $"Delete the profile '{profile.Name}'?",
+            yesText: "Delete",
+            cancelText: "Cancel");
+        if (confirmed != true)
+        {
+            return;
+        }
+
+        if (!await Profiles.DeleteAsync(profile.Id))
+        {
+            _notice = $"'{profile.Name}' cannot be deleted because statements were imported with it.";
+            return;
+        }
+
+        _profiles = await Profiles.ListAsync();
+    }
+
+    private string DateFormatHint() =>
+        BankProfileValidator.ExampleDate(_form?.DateFormat ?? string.Empty) is { } example
+            ? $"Example: {example}"
+            : "Not a usable format. Try yyyy-MM-dd or dd/MM/yyyy.";
+}
