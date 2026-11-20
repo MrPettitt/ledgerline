@@ -1,0 +1,11 @@
+<PageTitle>@Title - Ledgerline</PageTitle>
+
+<header class="page-header">
+    <MudText Typo="Typo.h4" HtmlTag="h1">@Title</MudText>
+    <MudText Typo="Typo.body1" Class="page-description">@Description</MudText>
+</header>
+
+@code {
+    [Parameter, EditorRequired] public string Title { get; set; } = string.Empty;
+    [Parameter, EditorRequired] public string Description { get; set; } = string.Empty;
+}
