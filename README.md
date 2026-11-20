@@ -47,7 +47,7 @@ All data in the screenshots is invented. The merchants come from [`samples/sampl
 
 ## Project status
 
-Current version: **v0.3.0**. This is a portfolio project. It is not a finished product and has only been used with invented data.
+Current version: **v0.3.1**. This is a portfolio project. It is not a finished product and has only been used with invented data.
 
 | Check | Status | Notes |
 |---|---|---|
@@ -58,12 +58,13 @@ Current version: **v0.3.0**. This is a portfolio project. It is not a finished p
 | A real bank export | 🟡 Not tested | Only the Generic CSV layout below has been used. Your bank may need its own profile |
 | Bank profile editor | ✅ Checked | Add, edit and delete profiles on Settings, then import with a new layout. Validation and delete protection tried in a browser |
 | Phones and narrow windows | 🟡 Not designed for | The navigation is a fixed side panel |
-| Accessibility audit | 🟡 Not done | Colours and focus order have not been formally checked |
+| Accessibility | ✅ Audited, see below | Contrast, structure, keyboard and reflow checked on every page in both themes. No screen reader testing yet |
 
 ## Release history
 
 | Version | What it added |
 |---|---|
+| v0.3.1 | Accessibility fixes: contrast, landmarks and headings, skip link, visible keyboard focus, narrow screens |
 | v0.3.0 | Bank profile editor on the Settings page, and column names that ignore capital letters |
 | v0.2.0 | Overview page: monthly and yearly spend, alerts callout, most expensive subscriptions, renewals in the next 30 days |
 | v0.1.0 | First release: app shell, CSV import, subscription detection, Alerts page, confirm, ignore and cancel controls, light and dark themes |
@@ -104,6 +105,24 @@ Current version: **v0.3.0**. This is a portfolio project. It is not a finished p
 - **Your choices are kept**: re-running detection updates amounts and dates but never overwrites a status you set.
 - **Light and dark themes**: warm off-white and white surfaces with one teal accent. Inter is bundled with the app, so no fonts are loaded from the internet.
 - **Local storage**: one SQLite file, `ledgerline.db`, next to the app. Money is stored as `decimal`.
+
+## Accessibility
+
+Ledgerline was checked against the WCAG 2.2 level AA criteria that can be tested on a page. The checks ran on all five pages in the light and dark themes, including the error and result messages.
+
+| Area | What was checked | Result |
+|---|---|---|
+| Colour contrast | The contrast of every visible piece of text against its real background, 4.5:1 for normal text and 3:1 for large text | ✅ Passes. Status colours (success, error, warning, info) and the dark theme's button text were darkened or lightened to get there |
+| Form fields | Input borders against the background, labels and helper text | ✅ Borders are at least 3:1 |
+| Structure | One `main` landmark, one `nav`, one `h1` per page, headings in order, page titles, `lang` | ✅ Passes |
+| Names | Every link, button and input has an accessible name. Icon buttons carry `aria-label`s and the table's actions column has a hidden heading | ✅ Passes |
+| Keyboard | Tab order, a "Skip to main content" link, and a 2px teal focus outline on every control | ✅ Passes |
+| Messages | Import results, import errors and form errors are announced through live regions | ✅ Passes |
+| Reflow | No horizontal scrolling at 320 px wide. The side panel becomes a strip on top and tables turn into labelled rows | ✅ Passes |
+| Target size | Buttons and links are at least 24 by 24 px | ✅ Passes |
+| Motion | Animations and transitions are removed when the system asks for reduced motion | ✅ Passes |
+
+Not done: testing with a screen reader (NVDA, JAWS or VoiceOver), automated scanners such as axe or Lighthouse, and any component state not reachable from these pages. The checks were scripted against the running app, so they cover what is on screen, not every possible state.
 
 ## Privacy and security
 
