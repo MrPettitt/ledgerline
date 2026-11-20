@@ -1,3 +1,4 @@
+using Ledgerline.Core.Detection;
 using Ledgerline.Core.Importing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,8 @@ public static class ServiceCollectionExtensions
         return services
             .AddDbContext<LedgerlineDbContext>(options => options.UseSqlite(connectionString))
             .AddSingleton<StatementParser>()
+            .AddSingleton<SubscriptionDetector>()
+            .AddScoped<SubscriptionDetectionService>()
             .AddScoped<StatementImporter>();
     }
 }
