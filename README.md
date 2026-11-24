@@ -48,7 +48,7 @@ All data in the screenshots is invented. The merchants come from [`samples/sampl
 
 ## Project status
 
-Current version: **v0.4.0**. This is a portfolio project. It is not a finished product and has only been used with invented data.
+Current version: **v0.4.1**. This is a portfolio project. It is not a finished product and has only been used with invented data.
 
 | Check | Status | Notes |
 |---|---|---|
@@ -65,6 +65,7 @@ Current version: **v0.4.0**. This is a portfolio project. It is not a finished p
 
 | Version | What it added |
 |---|---|
+| v0.4.1 | Removed a layout shift on the Alerts page (the web font was preloaded under the wrong address and fetched twice) and stopped empty-state messages flashing before data loads |
 | v0.4.0 | Subscription detail page with price history and every charge, dismissable alerts with a restore list, and a theme that is remembered between visits. Fixed tables switching to stacked rows on screens up to 1280 px wide |
 | v0.3.2 | Lighthouse and axe fixes: favicon, meta description, underlined in-text links, MudBlazor served compressed (mobile load 4.8 s to 1.5 s in Lighthouse), accessible delete dialog |
 | v0.3.1 | Accessibility fixes: contrast, landmarks and headings, skip link, visible keyboard focus, narrow screens |
@@ -126,7 +127,7 @@ Ledgerline was checked against the WCAG 2.2 level AA criteria that can be tested
 | Target size | Buttons and links are at least 24 by 24 px | ✅ Passes |
 | Motion | Animations and transitions are removed when the system asks for reduced motion | ✅ Passes |
 | axe-core 4.14 | 60 runs: ten pages and states (including the open row menu, a dismissed alert, the subscription detail page, the delete dialog and form errors) in light and dark, at 1024, 1280 and 375 px wide, using the WCAG 2.0 to 2.2 A and AA rules plus best practices, and 12 runs of the empty states on v0.3.2 | ✅ No violations |
-| Lighthouse 13 | The v0.4.0 release build, all six pages (including a subscription detail), desktop and mobile, 12 runs | ✅ 100 for accessibility, best practices and SEO on every run. Performance is 100 on ten runs, 99 on mobile Subscriptions and 93 on mobile Alerts, where the page shifts slightly as its list loads |
+| Lighthouse 13 | The v0.4.1 release build, all six pages (including a subscription detail), desktop and mobile, 12 runs | ✅ 100 for performance, accessibility, best practices and SEO on every run, with no layout shift. First paint is 0.4 s on desktop and 1.5 s on mobile under Lighthouse's simulated slow connection |
 
 Not done: testing with a screen reader (NVDA, JAWS or VoiceOver), and any component state not reachable from these pages. Axe could not work out the background for the brand and navigation text in some runs because elements overlap, so those were covered by the scripted contrast check instead. Automated tools find only part of the possible problems, so a manual review is still worth doing.
 
