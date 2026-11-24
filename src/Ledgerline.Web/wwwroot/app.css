@@ -318,3 +318,24 @@ main:focus {
         max-width: none;
     }
 }
+
+.list-row-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dismissed-row .list-title,
+.dismissed-row .page-description {
+    opacity: 0.75;
+}
+
+.back-link {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 4px 0;
+}
+
+.stat-date {
+    font-size: 1.4rem;
+}

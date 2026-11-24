@@ -1,0 +1,98 @@
+@page "/subscriptions/{Id:int}"
+@using Ledgerline.Core.Details
+@using Ledgerline.Core.Domain
+@using Ledgerline.Data
+@inject SubscriptionDetailService DetailData
+
+@if (_loaded && _detail is null)
+{
+    <PageHeader Title="Subscription not found" Description="No subscription has that address." />
+    <MudLink Href="/subscriptions" Underline="Underline.Always" Class="back-link">Back to subscriptions</MudLink>
+}
+else if (_detail is not null)
+{
+    <MudLink Href="/subscriptions" Underline="Underline.Always" Class="back-link">Back to subscriptions</MudLink>
+    <PageHeader Title="@_detail.MerchantName" Description="@Summary(_detail)" />
+
+    <div class="stat-grid">
+        <MudPaper Outlined Class="stat">
+            <div class="page-description">Current price</div>
+            <div class="stat-value">@_detail.CurrentAmount.ToString("N2")</div>
+            <div class="page-description">@Every(_detail)</div>
+        </MudPaper>
+        <MudPaper Outlined Class="stat">
+            <div class="page-description">Per month</div>
+            <div class="stat-value">@_detail.MonthlyCost.ToString("N2")</div>
+        </MudPaper>
+        <MudPaper Outlined Class="stat">
+            <div class="page-description">Total paid</div>
+            <div class="stat-value">@_detail.TotalPaid.ToString("N2")</div>
+            <div class="page-description">@_detail.ChargeCount @(_detail.ChargeCount == 1 ? "charge" : "charges")</div>
+        </MudPaper>
+        <MudPaper Outlined Class="stat">
+            <div class="page-description">Next renewal</div>
+            <div class="stat-value stat-date">@_detail.NextExpectedDate.ToString("yyyy-MM-dd")</div>
+            <div class="page-description">Last charged @_detail.LastChargeDate.ToString("yyyy-MM-dd")</div>
+        </MudPaper>
+    </div>
+
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Price history</MudText>
+    <MudPaper Outlined Class="list-panel">
+        @foreach (var point in _detail.PriceHistory)
+        {
+            <div class="list-row">
+                <div>
+                    <div class="list-title">@point.Amount.ToString("N2")</div>
+                    <div class="page-description">@Describe(point)</div>
+                </div>
+            </div>
+        }
+    </MudPaper>
+
+    <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Charges</MudText>
+    <MudPaper Outlined Class="table-panel">
+        <MudTable Items="_detail.Charges" Elevation="0" Hover="true" Breakpoint="Breakpoint.Md">
+            <HeaderContent>
+                <MudTh>Date</MudTh>
+                <MudTh>Description</MudTh>
+                <MudTh Style="text-align: right">Amount</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Date" Style="white-space: nowrap">@context.Date.ToString("yyyy-MM-dd")</MudTd>
+                <MudTd DataLabel="Description">@context.Description</MudTd>
+                <MudTd DataLabel="Amount" Style="text-align: right">@context.Amount.ToString("N2")</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    private SubscriptionDetail? _detail;
+    private bool _loaded;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        _detail = await DetailData.GetAsync(Id);
+        _loaded = true;
+    }
+
+    private static string Summary(SubscriptionDetail detail) =>
+        $"Billed {detail.Cadence.ToString().ToLowerInvariant()} since {detail.FirstChargeDate:yyyy-MM-dd}. Status: {detail.Status}.";
+
+    private static string Every(SubscriptionDetail detail) => detail.Cadence switch
+    {
+        BillingCadence.Weekly => "every week",
+        BillingCadence.Monthly => "every month",
+        BillingCadence.Quarterly => "every quarter",
+        _ => "every year"
+    };
+
+    private static string Describe(PricePoint point) => point.ChangePercent switch
+    {
+        null => $"Started on {point.From:yyyy-MM-dd}.",
+        > 0 => $"Went up {point.ChangePercent:0.0}% on {point.From:yyyy-MM-dd}.",
+        _ => $"Went down {Math.Abs(point.ChangePercent.Value):0.0}% on {point.From:yyyy-MM-dd}."
+    };
+}
