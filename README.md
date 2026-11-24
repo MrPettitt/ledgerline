@@ -47,7 +47,7 @@ All data in the screenshots is invented. The merchants come from [`samples/sampl
 
 ## Project status
 
-Current version: **v0.3.1**. This is a portfolio project. It is not a finished product and has only been used with invented data.
+Current version: **v0.3.2**. This is a portfolio project. It is not a finished product and has only been used with invented data.
 
 | Check | Status | Notes |
 |---|---|---|
@@ -58,12 +58,13 @@ Current version: **v0.3.1**. This is a portfolio project. It is not a finished p
 | A real bank export | 🟡 Not tested | Only the Generic CSV layout below has been used. Your bank may need its own profile |
 | Bank profile editor | ✅ Checked | Add, edit and delete profiles on Settings, then import with a new layout. Validation and delete protection tried in a browser |
 | Phones and narrow windows | 🟡 Not designed for | The navigation is a fixed side panel |
-| Accessibility | ✅ Audited, see below | Contrast, structure, keyboard and reflow checked on every page in both themes. No screen reader testing yet |
+| Accessibility | ✅ Audited, see below | Scripted checks plus axe-core and Lighthouse on every page, in both themes. No screen reader testing yet |
 
 ## Release history
 
 | Version | What it added |
 |---|---|
+| v0.3.2 | Lighthouse and axe fixes: favicon, meta description, underlined in-text links, MudBlazor served compressed (mobile load 4.8 s to 1.5 s in Lighthouse), accessible delete dialog |
 | v0.3.1 | Accessibility fixes: contrast, landmarks and headings, skip link, visible keyboard focus, narrow screens |
 | v0.3.0 | Bank profile editor on the Settings page, and column names that ignore capital letters |
 | v0.2.0 | Overview page: monthly and yearly spend, alerts callout, most expensive subscriptions, renewals in the next 30 days |
@@ -121,8 +122,10 @@ Ledgerline was checked against the WCAG 2.2 level AA criteria that can be tested
 | Reflow | No horizontal scrolling at 320 px wide. The side panel becomes a strip on top and tables turn into labelled rows | ✅ Passes |
 | Target size | Buttons and links are at least 24 by 24 px | ✅ Passes |
 | Motion | Animations and transitions are removed when the system asks for reduced motion | ✅ Passes |
+| axe-core 4.14 | 32 runs: every page and state (including the open row menu, the delete dialog and form errors) in light and dark, at 1280 px and 375 px wide, plus 12 runs of the empty states, using the WCAG 2.0 to 2.2 A and AA rules plus best practices | ✅ No violations |
+| Lighthouse 13 | The release build, all five pages, desktop and mobile | ✅ 100 for performance, accessibility, best practices and SEO on all ten runs |
 
-Not done: testing with a screen reader (NVDA, JAWS or VoiceOver), automated scanners such as axe or Lighthouse, and any component state not reachable from these pages. The checks were scripted against the running app, so they cover what is on screen, not every possible state.
+Not done: testing with a screen reader (NVDA, JAWS or VoiceOver), and any component state not reachable from these pages. Axe could not work out the background for the brand and navigation text in some runs because elements overlap, so those were covered by the scripted contrast check instead. Automated tools find only part of the possible problems, so a manual review is still worth doing.
 
 ## Privacy and security
 
