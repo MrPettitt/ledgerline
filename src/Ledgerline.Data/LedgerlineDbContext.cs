@@ -11,6 +11,8 @@ public class LedgerlineDbContext(DbContextOptions<LedgerlineDbContext> options) 
     public DbSet<Merchant> Merchants => Set<Merchant>();
     public DbSet<Subscription> Subscriptions => Set<Subscription>();
     public DbSet<SubscriptionEvent> SubscriptionEvents => Set<SubscriptionEvent>();
+    public DbSet<AppSetting> Settings => Set<AppSetting>();
+    public DbSet<DismissedAlert> DismissedAlerts => Set<DismissedAlert>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -37,5 +39,10 @@ public class LedgerlineDbContext(DbContextOptions<LedgerlineDbContext> options) 
         modelBuilder.Entity<Subscription>().Property(s => s.Status).HasConversion<string>();
         modelBuilder.Entity<Subscription>().Property(s => s.Cadence).HasConversion<string>();
         modelBuilder.Entity<SubscriptionEvent>().Property(e => e.Type).HasConversion<string>();
+
+        modelBuilder.Entity<AppSetting>().HasKey(s => s.Key);
+
+        modelBuilder.Entity<DismissedAlert>().Property(a => a.Kind).HasConversion<string>();
+        modelBuilder.Entity<DismissedAlert>().HasIndex(a => new { a.SubscriptionId, a.Kind, a.AlertDate }).IsUnique();
     }
 }

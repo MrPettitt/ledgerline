@@ -17,6 +17,20 @@ namespace Ledgerline.Data.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.15");
 
+            modelBuilder.Entity("Ledgerline.Core.Domain.AppSetting", b =>
+                {
+                    b.Property<string>("Key")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Key");
+
+                    b.ToTable("Settings");
+                });
+
             modelBuilder.Entity("Ledgerline.Core.Domain.BankProfile", b =>
                 {
                     b.Property<int>("Id")
@@ -64,6 +78,33 @@ namespace Ledgerline.Data.Migrations
                             DescriptionColumn = "Description",
                             Name = "Generic CSV"
                         });
+                });
+
+            modelBuilder.Entity("Ledgerline.Core.Domain.DismissedAlert", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateOnly>("AlertDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("DismissedAt")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Kind")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SubscriptionId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubscriptionId", "Kind", "AlertDate")
+                        .IsUnique();
+
+                    b.ToTable("DismissedAlerts");
                 });
 
             modelBuilder.Entity("Ledgerline.Core.Domain.Merchant", b =>
@@ -216,6 +257,17 @@ namespace Ledgerline.Data.Migrations
                     b.HasIndex("StatementImportId");
 
                     b.ToTable("Transactions");
+                });
+
+            modelBuilder.Entity("Ledgerline.Core.Domain.DismissedAlert", b =>
+                {
+                    b.HasOne("Ledgerline.Core.Domain.Subscription", "Subscription")
+                        .WithMany()
+                        .HasForeignKey("SubscriptionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Subscription");
                 });
 
             modelBuilder.Entity("Ledgerline.Core.Domain.StatementImport", b =>
