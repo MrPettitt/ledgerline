@@ -89,7 +89,8 @@ h1:focus {
 .table-panel {
     margin-top: 32px;
     border: 1px solid var(--mud-palette-lines-default);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .subscriptions-empty {
@@ -259,7 +260,7 @@ main:focus {
 }
 
 /* Narrow screens: the side panel becomes a strip above the page */
-@media (max-width: 900px) {
+@media (max-width: 960px) {
     .mud-main-content {
         padding-left: 0 !important;
         margin-left: 0 !important;
