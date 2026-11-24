@@ -11,7 +11,7 @@
 @if (_summary.ActiveCount == 0)
 {
     <MudText Class="page-description overview-empty">
-        No subscriptions yet. <MudLink Href="/import">Import a statement</MudLink> to get started.
+        No subscriptions yet. <MudLink Href="/import" Underline="Underline.Always">Import a statement</MudLink> to get started.
     </MudText>
 }
 else
@@ -36,7 +36,7 @@ else
     {
         <MudPaper Outlined Class="attention">
             <MudText>@_alertCount @(_alertCount == 1 ? "alert needs" : "alerts need") your attention.</MudText>
-            <MudLink Href="/alerts">View alerts</MudLink>
+            <MudLink Href="/alerts" Underline="Underline.Always">View alerts</MudLink>
         </MudPaper>
     }
 
