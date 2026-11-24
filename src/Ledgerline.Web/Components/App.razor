@@ -5,9 +5,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
+    @* MudBlazor is linked without a fingerprint because the fingerprinted URLs are served uncompressed, about 15 times larger. *@
+    <meta name="description" content="Find recurring subscriptions in your bank statements, flag price increases and get warned before renewals. Runs locally; your data stays on your computer." />
+    <link rel="icon" type="image/svg+xml" href="@Assets["favicon.svg"]" />
     <ResourcePreloader />
     <link rel="preload" href="@Assets["fonts/inter-latin-wght-normal.woff2"]" as="font" type="font/woff2" crossorigin />
-    <link rel="stylesheet" href="@Assets["_content/MudBlazor/MudBlazor.min.css"]" />
+    <link rel="stylesheet" href="_content/MudBlazor/MudBlazor.min.css" />
     <link rel="stylesheet" href="@Assets["app.css"]" />
     <ImportMap />
     <HeadOutlet @rendermode="NoPrerender" />
@@ -16,7 +19,7 @@
 <body>
     <Routes @rendermode="NoPrerender" />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
-    <script src="@Assets["_content/MudBlazor/MudBlazor.min.js"]"></script>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
 </body>
 
 </html>
