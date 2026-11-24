@@ -9,7 +9,7 @@
 ![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)
 ![Blazor](https://img.shields.io/badge/Blazor-Interactive%20Server-512BD4?logo=blazor&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-local%20file-003B57?logo=sqlite&logoColor=white)
-![Tests](https://img.shields.io/badge/unit%20tests-70-brightgreen)
+![Tests](https://img.shields.io/badge/unit%20tests-88-brightgreen)
 ![Network](https://img.shields.io/badge/network-local%20only-lightgrey)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
@@ -29,6 +29,7 @@ No account. No cloud. No sign-in.
 
 <p align="center">
   <img src="docs/screenshots/settings.png" width="48%" alt="Settings page listing bank profiles" />
+  <img src="docs/screenshots/subscription-detail.png" width="48%" alt="Subscription detail with price history and charges" />
 </p>
 
 All data in the screenshots is invented. The merchants come from [`samples/sample-statement.csv`](samples/sample-statement.csv).
@@ -47,14 +48,14 @@ All data in the screenshots is invented. The merchants come from [`samples/sampl
 
 ## Project status
 
-Current version: **v0.3.2**. This is a portfolio project. It is not a finished product and has only been used with invented data.
+Current version: **v0.4.0**. This is a portfolio project. It is not a finished product and has only been used with invented data.
 
 | Check | Status | Notes |
 |---|---|---|
 | Build and tests in CI | ✅ Passing | Runs on every push and pull request |
-| Unit tests | ✅ 70 passing | Parser, bank profiles, merchant matching, importer, detector, alerts, summary, statuses and a migration smoke test |
+| Unit tests | ✅ 88 passing | Parser, bank profiles, merchant matching, importer, detector, alerts and dismissals, summary, statuses, subscription detail, remembered theme and a migration smoke test |
 | Windows release build | ✅ Checked | The published build runs from its own folder and serves pages, styles and the font. Checked on a machine that also has .NET installed |
-| Pages in a browser | ✅ Checked | Overview, Subscriptions, Import, Alerts and Settings exercised with invented data. Dark theme spot-checked |
+| Pages in a browser | ✅ Checked | Overview, Subscriptions, subscription detail, Import, Alerts and Settings exercised with invented data. Dark theme spot-checked |
 | A real bank export | 🟡 Not tested | Only the Generic CSV layout below has been used. Your bank may need its own profile |
 | Bank profile editor | ✅ Checked | Add, edit and delete profiles on Settings, then import with a new layout. Validation and delete protection tried in a browser |
 | Phones and narrow windows | 🟡 Not designed for | The navigation is a fixed side panel |
@@ -64,6 +65,7 @@ Current version: **v0.3.2**. This is a portfolio project. It is not a finished p
 
 | Version | What it added |
 |---|---|
+| v0.4.0 | Subscription detail page with price history and every charge, dismissable alerts with a restore list, and a theme that is remembered between visits. Fixed tables switching to stacked rows on screens up to 1280 px wide |
 | v0.3.2 | Lighthouse and axe fixes: favicon, meta description, underlined in-text links, MudBlazor served compressed (mobile load 4.8 s to 1.5 s in Lighthouse), accessible delete dialog |
 | v0.3.1 | Accessibility fixes: contrast, landmarks and headings, skip link, visible keyboard focus, narrow screens |
 | v0.3.0 | Bank profile editor on the Settings page, and column names that ignore capital letters |
@@ -102,9 +104,10 @@ Current version: **v0.3.2**. This is a portfolio project. It is not a finished p
 - **Bank profiles**: add, edit and delete the CSV layouts on the Settings page. The date format shows a live example, column names ignore capital letters, and a profile that statements were imported with cannot be deleted.
 - **Subscriptions table**: amount, billing interval, next expected date, status and a note such as `Price changed from 149,99 to 169,99 on 2026-10-03`.
 - **Overview**: monthly and yearly totals. Weekly, quarterly and yearly subscriptions are converted to a monthly cost so they can be added up.
-- **Alerts**: missed charges first, then price increases, then renewals by date. Price decreases are not flagged.
+- **Alerts**: missed charges first, then price increases, then renewals by date. Price decreases are not flagged. Dismiss an alert you have dealt with and restore it later from the Dismissed list. A new price change or a later missed renewal raises a fresh alert.
+- **Subscription detail**: click a merchant to see its price history (with each change as a percentage), every charge, the total paid so far, the monthly cost and the next renewal.
 - **Your choices are kept**: re-running detection updates amounts and dates but never overwrites a status you set.
-- **Light and dark themes**: warm off-white and white surfaces with one teal accent. Inter is bundled with the app, so no fonts are loaded from the internet.
+- **Light and dark themes**: your choice is remembered between visits. Warm off-white and white surfaces with one teal accent. Inter is bundled with the app, so no fonts are loaded from the internet.
 - **Local storage**: one SQLite file, `ledgerline.db`, next to the app. Money is stored as `decimal`.
 
 ## Accessibility
@@ -122,8 +125,8 @@ Ledgerline was checked against the WCAG 2.2 level AA criteria that can be tested
 | Reflow | No horizontal scrolling at 320 px wide. The side panel becomes a strip on top and tables turn into labelled rows | ✅ Passes |
 | Target size | Buttons and links are at least 24 by 24 px | ✅ Passes |
 | Motion | Animations and transitions are removed when the system asks for reduced motion | ✅ Passes |
-| axe-core 4.14 | 32 runs: every page and state (including the open row menu, the delete dialog and form errors) in light and dark, at 1280 px and 375 px wide, plus 12 runs of the empty states, using the WCAG 2.0 to 2.2 A and AA rules plus best practices | ✅ No violations |
-| Lighthouse 13 | The release build, all five pages, desktop and mobile | ✅ 100 for performance, accessibility, best practices and SEO on all ten runs |
+| axe-core 4.14 | 60 runs: ten pages and states (including the open row menu, a dismissed alert, the subscription detail page, the delete dialog and form errors) in light and dark, at 1024, 1280 and 375 px wide, using the WCAG 2.0 to 2.2 A and AA rules plus best practices, and 12 runs of the empty states on v0.3.2 | ✅ No violations |
+| Lighthouse 13 | The v0.3.2 release build, all five pages, desktop and mobile (not re-run for v0.4.0) | ✅ 100 for performance, accessibility, best practices and SEO on all ten runs |
 
 Not done: testing with a screen reader (NVDA, JAWS or VoiceOver), and any component state not reachable from these pages. Axe could not work out the background for the brand and navigation text in some runs because elements overlap, so those were covered by the scripted contrast check instead. Automated tools find only part of the possible problems, so a manual review is still worth doing.
 
@@ -153,6 +156,7 @@ Not done: testing with a screen reader (NVDA, JAWS or VoiceOver), and any compon
 src/
 ├── Ledgerline.Core/        # Logic only. No UI or database references
 │   ├── Domain/             # Entities and enums
+│   ├── Details/            # Subscription detail: price history and charges
 │   ├── Importing/          # Statement parser, bank profile validation, merchant keys, fingerprints
 │   ├── Detection/          # Subscription detector and cadence rules
 │   ├── Alerts/             # Alert builder
@@ -160,7 +164,7 @@ src/
 ├── Ledgerline.Data/        # EF Core context, migrations, importer and detection services
 └── Ledgerline.Web/         # Blazor app
     ├── Components/Layout/  # Main layout, navigation, page header
-    ├── Components/Pages/   # Overview, Subscriptions, Import, Alerts, Settings
+    ├── Components/Pages/   # Overview, Subscriptions, subscription detail, Import, Alerts, Settings
     ├── LedgerlineTheme.cs  # Colours, radius and typography
     └── wwwroot/            # Styles and the bundled Inter font
 tests/
@@ -181,6 +185,8 @@ Core references nothing. Data references Core. Web references Core and Data.
 | `Merchant` | A normalised merchant key and display name |
 | `Subscription` | A merchant's recurring charge: cadence, current amount, dates and status (`Suspected`, `Confirmed`, `Ignored`, `Cancelled`) |
 | `SubscriptionEvent` | `PriceChange`, `Renewal` or `Missed`, with the amounts involved |
+| `DismissedAlert` | An alert you dealt with, identified by subscription, kind and date |
+| `AppSetting` | A remembered preference, such as the theme |
 
 ## Getting started
 
@@ -251,10 +257,8 @@ The release workflow runs the tests, builds the zip and creates the release with
 ## Roadmap
 
 - A ready-made profile for Standard Bank once a real export's headers are known
-- Remember the theme choice between visits
-- Dismiss an alert you have dealt with
-- Spending history per subscription
-- A layout that works on narrow screens
+- Export your subscriptions to CSV, and a one-click backup of the database
+- Screen reader testing and fixes
 
 ## License
 
