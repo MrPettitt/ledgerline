@@ -8,42 +8,45 @@
 
 <PageHeader Title="Import" Description="Bring in a bank statement CSV from this page." />
 
-@if (_profiles.Count == 0)
+@if (_loaded)
 {
-    <MudText Class="page-description import-empty">
-        No bank profile yet. <MudLink Href="/settings" Underline="Underline.Always">Add one in Settings</MudLink> first.
-    </MudText>
-}
-else
-{
-    <MudPaper Outlined Class="import-panel">
-        <MudSelect T="int" @bind-Value="_bankProfileId" Label="Bank profile" Variant="Variant.Outlined">
-            @foreach (var profile in _profiles)
-            {
-                <MudSelectItem T="int" Value="@profile.Id">@profile.Name</MudSelectItem>
-            }
-        </MudSelect>
+    @if (_profiles.Count == 0)
+    {
+        <MudText Class="page-description import-empty">
+            No bank profile yet. <MudLink Href="/settings" Underline="Underline.Always">Add one in Settings</MudLink> first.
+        </MudText>
+    }
+    else
+    {
+        <MudPaper Outlined Class="import-panel">
+            <MudSelect T="int" @bind-Value="_bankProfileId" Label="Bank profile" Variant="Variant.Outlined">
+                @foreach (var profile in _profiles)
+                {
+                    <MudSelectItem T="int" Value="@profile.Id">@profile.Name</MudSelectItem>
+                }
+            </MudSelect>
 
-        <MudFileUpload T="IBrowserFile" Accept=".csv" FilesChanged="OnFileChosen" />
+            <MudFileUpload T="IBrowserFile" Accept=".csv" FilesChanged="OnFileChosen" />
 
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_file is null || _importing)" OnClick="ImportAsync">
-            Import
-        </MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(_file is null || _importing)" OnClick="ImportAsync">
+                Import
+            </MudButton>
 
-        <div aria-live="polite" class="import-messages">
-            @if (_error is not null)
-            {
-                <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
-            }
-            @if (_result is not null)
-            {
-                <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
-                    Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
-                    Found @_subscriptionCount recurring @(_subscriptionCount == 1 ? "charge" : "charges").
-                </MudAlert>
-            }
-        </div>
-    </MudPaper>
+            <div aria-live="polite" class="import-messages">
+                @if (_error is not null)
+                {
+                    <MudAlert Severity="Severity.Error" Variant="Variant.Outlined">@_error</MudAlert>
+                }
+                @if (_result is not null)
+                {
+                    <MudAlert Severity="Severity.Success" Variant="Variant.Outlined">
+                        Read @_result.RowsRead debits. Added @_result.Added, skipped @_result.Duplicates already imported.
+                        Found @_subscriptionCount recurring @(_subscriptionCount == 1 ? "charge" : "charges").
+                    </MudAlert>
+                }
+            </div>
+        </MudPaper>
+    }
 }
 
 @code {
@@ -56,11 +59,13 @@ else
     private int _subscriptionCount;
     private string? _error;
     private bool _importing;
+    private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {
         _profiles = await Profiles.ListAsync();
         _bankProfileId = _profiles.FirstOrDefault()?.Id ?? 0;
+        _loaded = true;
     }
 
     private void OnFileChosen(IBrowserFile? file)

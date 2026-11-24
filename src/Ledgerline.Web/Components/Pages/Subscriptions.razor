@@ -7,54 +7,58 @@
 
 <PageHeader Title="Subscriptions" Description="Every recurring charge Ledgerline finds is listed here." />
 
-@if (_subscriptions.Count == 0)
+@if (_loaded)
 {
-    <MudText Class="page-description subscriptions-empty">No subscriptions found yet. Import a statement to get started.</MudText>
-}
-else
-{
-    <MudPaper Outlined Class="table-panel">
-        <MudTable Items="_subscriptions" Elevation="0" Hover="true" Dense="false" RowClassFunc="RowClass" Breakpoint="Breakpoint.Sm">
-            <HeaderContent>
-                <MudTh>Merchant</MudTh>
-                <MudTh Style="text-align: right">Amount</MudTh>
-                <MudTh>Billed</MudTh>
-                <MudTh>Next expected</MudTh>
-                <MudTh>Status</MudTh>
-                <MudTh>Notes</MudTh>
-                <MudTh><span class="visually-hidden">Actions</span></MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd DataLabel="Merchant">
-                    <MudLink Href="@($"/subscriptions/{context.Id}")" Underline="Underline.Always">@context.Merchant?.DisplayName</MudLink>
-                </MudTd>
-                <MudTd DataLabel="Amount" Style="text-align: right">@context.CurrentAmount.ToString("N2")</MudTd>
-                <MudTd DataLabel="Billed">@context.Cadence</MudTd>
-                <MudTd DataLabel="Next expected" Style="white-space: nowrap">@context.NextExpectedDate.ToString("yyyy-MM-dd")</MudTd>
-                <MudTd DataLabel="Status">
-                    <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
-                             Color="@(context.Status == SubscriptionStatus.Confirmed ? Color.Primary : Color.Default)">
-                        @context.Status
-                    </MudChip>
-                </MudTd>
-                <MudTd DataLabel="Notes">@Note(context)</MudTd>
-                <MudTd>
-                    <MudMenu Icon="@Icons.Material.Outlined.MoreVert" Size="Size.Small" AriaLabel="@($"Actions for {context.Merchant?.DisplayName}")">
-                        @foreach (var status in Enum.GetValues<SubscriptionStatus>().Where(s => s != context.Status))
-                        {
-                            var subscription = context;
-                            var target = status;
-                            <MudMenuItem OnClick="() => SetStatus(subscription, target)">@ActionLabel(target)</MudMenuItem>
-                        }
-                    </MudMenu>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
-    </MudPaper>
+    @if (_subscriptions.Count == 0)
+    {
+        <MudText Class="page-description subscriptions-empty">No subscriptions found yet. Import a statement to get started.</MudText>
+    }
+    else
+    {
+        <MudPaper Outlined Class="table-panel">
+            <MudTable Items="_subscriptions" Elevation="0" Hover="true" Dense="false" RowClassFunc="RowClass" Breakpoint="Breakpoint.Sm">
+                <HeaderContent>
+                    <MudTh>Merchant</MudTh>
+                    <MudTh Style="text-align: right">Amount</MudTh>
+                    <MudTh>Billed</MudTh>
+                    <MudTh>Next expected</MudTh>
+                    <MudTh>Status</MudTh>
+                    <MudTh>Notes</MudTh>
+                    <MudTh><span class="visually-hidden">Actions</span></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Merchant">
+                        <MudLink Href="@($"/subscriptions/{context.Id}")" Underline="Underline.Always">@context.Merchant?.DisplayName</MudLink>
+                    </MudTd>
+                    <MudTd DataLabel="Amount" Style="text-align: right">@context.CurrentAmount.ToString("N2")</MudTd>
+                    <MudTd DataLabel="Billed">@context.Cadence</MudTd>
+                    <MudTd DataLabel="Next expected" Style="white-space: nowrap">@context.NextExpectedDate.ToString("yyyy-MM-dd")</MudTd>
+                    <MudTd DataLabel="Status">
+                        <MudChip T="string" Size="Size.Small" Variant="Variant.Outlined"
+                                 Color="@(context.Status == SubscriptionStatus.Confirmed ? Color.Primary : Color.Default)">
+                            @context.Status
+                        </MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="Notes">@Note(context)</MudTd>
+                    <MudTd>
+                        <MudMenu Icon="@Icons.Material.Outlined.MoreVert" Size="Size.Small" AriaLabel="@($"Actions for {context.Merchant?.DisplayName}")">
+                            @foreach (var status in Enum.GetValues<SubscriptionStatus>().Where(s => s != context.Status))
+                            {
+                                var subscription = context;
+                                var target = status;
+                                <MudMenuItem OnClick="() => SetStatus(subscription, target)">@ActionLabel(target)</MudMenuItem>
+                            }
+                        </MudMenu>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudPaper>
+    }
 }
 
 @code {
     private List<Subscription> _subscriptions = [];
+    private bool _loaded;
 
     protected override Task OnInitializedAsync() => LoadAsync();
 
@@ -68,6 +72,7 @@ else
 
         // SQLite cannot order decimals, and the list is small.
         _subscriptions = subscriptions.OrderByDescending(s => s.CurrentAmount).ToList();
+        _loaded = true;
     }
 
     private async Task SetStatus(Subscription subscription, SubscriptionStatus status)

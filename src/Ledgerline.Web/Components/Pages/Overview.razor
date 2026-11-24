@@ -8,71 +8,75 @@
 
 <PageHeader Title="Overview" Description="What you spend on subscriptions, and what needs a look." />
 
-@if (_summary.ActiveCount == 0)
+@if (_loaded)
 {
-    <MudText Class="page-description overview-empty">
-        No subscriptions yet. <MudLink Href="/import" Underline="Underline.Always">Import a statement</MudLink> to get started.
-    </MudText>
-}
-else
-{
-    <div class="stat-grid">
-        <MudPaper Outlined Class="stat">
-            <div class="page-description">Per month</div>
-            <div class="stat-value">@_summary.MonthlyTotal.ToString("N2")</div>
-        </MudPaper>
-        <MudPaper Outlined Class="stat">
-            <div class="page-description">Per year</div>
-            <div class="stat-value">@_summary.YearlyTotal.ToString("N2")</div>
-        </MudPaper>
-        <MudPaper Outlined Class="stat">
-            <div class="page-description">Subscriptions</div>
-            <div class="stat-value">@_summary.ActiveCount</div>
-            <div class="page-description">@_summary.ConfirmedCount confirmed, @_summary.SuspectedCount suspected</div>
-        </MudPaper>
-    </div>
-
-    @if (_alertCount > 0)
+    @if (_summary.ActiveCount == 0)
     {
-        <MudPaper Outlined Class="attention">
-            <MudText>@_alertCount @(_alertCount == 1 ? "alert needs" : "alerts need") your attention.</MudText>
-            <MudLink Href="/alerts" Underline="Underline.Always">View alerts</MudLink>
-        </MudPaper>
-    }
-
-    <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Most expensive</MudText>
-    <MudPaper Outlined Class="list-panel">
-        @foreach (var cost in _summary.MostExpensive)
-        {
-            <div class="list-row">
-                <span>@cost.MerchantName</span>
-                <span class="page-description">@cost.MonthlyCost.ToString("N2") per month</span>
-            </div>
-        }
-    </MudPaper>
-
-    <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Coming up in the next 30 days</MudText>
-    @if (_summary.UpcomingRenewals.Count == 0)
-    {
-        <MudText Class="page-description">No renewals expected.</MudText>
+        <MudText Class="page-description overview-empty">
+            No subscriptions yet. <MudLink Href="/import" Underline="Underline.Always">Import a statement</MudLink> to get started.
+        </MudText>
     }
     else
     {
+        <div class="stat-grid">
+            <MudPaper Outlined Class="stat">
+                <div class="page-description">Per month</div>
+                <div class="stat-value">@_summary.MonthlyTotal.ToString("N2")</div>
+            </MudPaper>
+            <MudPaper Outlined Class="stat">
+                <div class="page-description">Per year</div>
+                <div class="stat-value">@_summary.YearlyTotal.ToString("N2")</div>
+            </MudPaper>
+            <MudPaper Outlined Class="stat">
+                <div class="page-description">Subscriptions</div>
+                <div class="stat-value">@_summary.ActiveCount</div>
+                <div class="page-description">@_summary.ConfirmedCount confirmed, @_summary.SuspectedCount suspected</div>
+            </MudPaper>
+        </div>
+
+        @if (_alertCount > 0)
+        {
+            <MudPaper Outlined Class="attention">
+                <MudText>@_alertCount @(_alertCount == 1 ? "alert needs" : "alerts need") your attention.</MudText>
+                <MudLink Href="/alerts" Underline="Underline.Always">View alerts</MudLink>
+            </MudPaper>
+        }
+
+        <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Most expensive</MudText>
         <MudPaper Outlined Class="list-panel">
-            @foreach (var renewal in _summary.UpcomingRenewals)
+            @foreach (var cost in _summary.MostExpensive)
             {
                 <div class="list-row">
-                    <span>@renewal.MerchantName</span>
-                    <span class="page-description">@renewal.Amount.ToString("N2") on @renewal.Date.ToString("yyyy-MM-dd")</span>
+                    <span>@cost.MerchantName</span>
+                    <span class="page-description">@cost.MonthlyCost.ToString("N2") per month</span>
                 </div>
             }
         </MudPaper>
+
+        <MudText Typo="Typo.h6" HtmlTag="h2" Class="section-title">Coming up in the next 30 days</MudText>
+        @if (_summary.UpcomingRenewals.Count == 0)
+        {
+            <MudText Class="page-description">No renewals expected.</MudText>
+        }
+        else
+        {
+            <MudPaper Outlined Class="list-panel">
+                @foreach (var renewal in _summary.UpcomingRenewals)
+                {
+                    <div class="list-row">
+                        <span>@renewal.MerchantName</span>
+                        <span class="page-description">@renewal.Amount.ToString("N2") on @renewal.Date.ToString("yyyy-MM-dd")</span>
+                    </div>
+                }
+            </MudPaper>
+        }
     }
 }
 
 @code {
     private OverviewSummary _summary = new(0, 0, 0, 0, [], []);
     private int _alertCount;
+    private bool _loaded;
 
     protected override async Task OnInitializedAsync()
     {
@@ -86,5 +90,6 @@ else
 
         _summary = new OverviewSummaryBuilder().Build(subscriptions, today);
         _alertCount = (await Alerts.GetAsync(today)).Active.Count;
+        _loaded = true;
     }
 }
