@@ -1,9 +1,9 @@
 @page "/"
-@using Ledgerline.Core.Alerts
 @using Ledgerline.Core.Summary
 @using Ledgerline.Data
 @using Microsoft.EntityFrameworkCore
 @inject LedgerlineDbContext Database
+@inject AlertService Alerts
 @inject TimeProvider Time
 
 <PageHeader Title="Overview" Description="What you spend on subscriptions, and what needs a look." />
@@ -85,6 +85,6 @@ else
             .ToListAsync();
 
         _summary = new OverviewSummaryBuilder().Build(subscriptions, today);
-        _alertCount = new AlertBuilder().Build(subscriptions, today).Count;
+        _alertCount = (await Alerts.GetAsync(today)).Active.Count;
     }
 }

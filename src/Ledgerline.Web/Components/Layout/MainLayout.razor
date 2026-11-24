@@ -1,4 +1,6 @@
 @inherits LayoutComponentBase
+@using Ledgerline.Data
+@inject AppSettingsService Settings
 
 <MudThemeProvider Theme="_theme" @bind-IsDarkMode="_isDarkMode" />
 
@@ -36,5 +38,11 @@
     private readonly MudTheme _theme = LedgerlineTheme.Create();
     private bool _isDarkMode;
 
-    private void ToggleDarkMode() => _isDarkMode = !_isDarkMode;
+    protected override async Task OnInitializedAsync() => _isDarkMode = await Settings.GetDarkModeAsync();
+
+    private async Task ToggleDarkMode()
+    {
+        _isDarkMode = !_isDarkMode;
+        await Settings.SetDarkModeAsync(_isDarkMode);
+    }
 }
